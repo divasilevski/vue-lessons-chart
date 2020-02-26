@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { mapStat } from "vuex";
+import { mapState } from "vuex";
 export default {
   middleware: ["chat"],
   head() {

@@ -25,7 +25,6 @@
             <v-btn :disabled="!valid" color="primary" @click="submit">
               Войти
             </v-btn>
-
           </v-form>
         </v-card-text>
       </v-card>
@@ -34,7 +33,7 @@
 </template>
 
 <script>
-import {mapMutations} from "vuex";
+import { mapMutations } from "vuex";
 export default {
   layout: "empty",
   head: {
@@ -53,8 +52,7 @@ export default {
       v => (v && v.length <= 16) || "Имя не должно превышать 16 символов"
     ],
     room: "",
-    roomRules: [
-      v => !!v || "введите комнату"],
+    roomRules: [v => !!v || "введите комнату"]
   }),
   methods: {
     ...mapMutations(["setUser"]),
@@ -63,10 +61,17 @@ export default {
         const user = {
           name: this.name,
           room: this.room
-        }
+        };
 
-        this.setUser(user);
-        this.$router.push("/chat")
+        this.$socket.emit("userJoined", user, data => {
+          if (typeof data === "string") {
+            console.error(data);
+          } else {
+            user.id = data.userId;
+            this.setUser(user);
+            this.$router.push("/chat");
+          }
+        });
       }
     }
   }
