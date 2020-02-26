@@ -37,6 +37,9 @@
 import {mapMutations} from "vuex";
 export default {
   layout: "empty",
+  head: {
+    title: "Вход"
+  },
   sockets: {
     connect: function() {
       console.log("socket connected");
