@@ -13,6 +13,7 @@ io.on("connection", socket => {
     users.add({ id: socket.id, name: data.name, room: data.room });
     socket.join(data.room);
     cb({ userId: socket.id });
+    io.to(data.room).emit("updateUsers", users.getByRoom(data.room));
     socket.emit("newMessage", m("admin", `Добро пожаловать ${data.name}`));
     socket.broadcast
       .to(data.room)
@@ -30,6 +31,30 @@ io.on("connection", socket => {
     }
 
     cb();
+  });
+
+  socket.on("userLeft", (id, cb) => {
+    const user = users.remove(id);
+    if (user) {
+      io.to(user.room).emit("updateUsers", users.getByRoom(user.room));
+      io.to(user.room).emit(
+        "newMessage",
+        m("admin", `Пользователь ${user.name} вышел.`)
+      );
+    }
+
+    cb();
+  });
+
+  socket.on("disconnect", () => {
+    const user = users.remove(socket.id);
+    if (user) {
+      io.to(user.room).emit("updateUsers", users.getByRoom(user.room));
+      io.to(user.room).emit(
+        "newMessage",
+        m("admin", `Пользователь ${user.name} вышел.`)
+      );
+    }
   });
 });
 
